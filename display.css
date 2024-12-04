@@ -83,17 +83,16 @@ header {
 .details {
     display: flex;
     flex-direction: column;
-    height: 40vh;
+    height: auto;
     width: 15vw;
     position: fixed;
     top: 10vh;
+    z-index: 2;
     left: 0;
-    background: black;
-    opacity: 50%;
-    justify-content: center;
 }
 
 .details p {
+    margin: 0.5vw 0;
     margin-left: 2vw;
     color: white;
     font-size: 2.5vh;
