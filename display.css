@@ -84,12 +84,12 @@ header {
     display: flex;
     flex-direction: column;
     height: 40vh;
-    width: 25vw;
+    width: 15vw;
     position: fixed;
     top: 10vh;
     left: 0;
     background: black;
-    opacity: 20%;
+    opacity: 50%;
     justify-content: center;
 }
 
