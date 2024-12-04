@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lanczos Scaling Algorithm </title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 60px; /* Adjust header height */
+            padding: 0 20px;
+            border-bottom: 2px groove black;
+            background: #5797a3;
+            color: #ffdfdf;
+            position: fixed;
+            top: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+            z-index: 1000;
+        }
+        
+        header .logo a {
+            color: #ffdfdf; /* Matches the header text color */
+            text-decoration: none; /* Removes the underline */
+            font-size: 1.5rem; /* Adjust size of the home icon */
+            cursor: pointer;
+        }
+        
+        header nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            justify-content: space-evenly; /* Evenly spaces the items */
+            flex-grow: 1; /* Makes the nav section take up available space */
+        }
+        
+        header nav ul li {
+            font-variant: small-caps;
+            font-weight: 600;
+            font-size: 1rem;
+            text-align: center;
+        }
+        
+        header nav ul li a {
+            text-decoration: none; /* Remove underline */
+            color: #ffdfdf; /* Matches the header text color */
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+            margin-left: 220px;
+        }
+        
+        header nav ul li a:hover {
+            color: #333; /* Change color on hover */
+        }
+        
+        
+        
+        body {
+            font-family: "Poppins", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #faf1e8;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            margin-top: 5%; /* Add margin to avoid overlap with the fixed header */
+        }
+        h1 {
+            background-color: #7eacb5;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #c96868;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        .canvas-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(255,255,255,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 2px solid #7eacb5;
+            image-rendering: pixelated;
+            background-color: #f0f0f0;
+        }
+        .controls {
+            margin: 20px 0;
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .controls select, .controls button {
+            font-family: 'Poppins', sans-serif;
+            padding: 8px 12px;
+            margin: 0 10px;
+            border: 1px solid #7eacb5;
+            border-radius: 5px;
+            color: #ffffff;
+            background-color:  #c96868;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .controls button:hover {
+            background-color: #e1aaaa;
+            color: white;
+        }
+        .explanation {
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid #7eacb5;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .explanation h3 {
+            color: #7eacb5;
+            border-bottom: 2px solid #7eacb5;
+            padding-bottom: 10px;
+        }
+        #stepDescription {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #c96868;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="/display.html" class="home-link">
+                <i class="fas fa-home"></i>
+            </a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="bicubic.html">Bicubic</a></li>
+                <li><a href="lancoze.html">Lanczos</a></li>
+                <li><a href="nearest_neighbour.html">Nearest Neighbour</a></li>
+                <li><a href="bilinear.html">Bilinear</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1>Lanczos Scaling Algorithm Animation</h1>
+    
+    <div id="stepDescription">Click 'Start Animation' to begin</div>
+    
+    <div class="container">
+        <div class="canvas-wrapper">
+            <h2>Original Image</h2>
+            <div style="position: relative;">
+                <canvas id="originalCanvas"></canvas>
+            </div>
+        </div>
+        <div class="canvas-wrapper">
+            <h2>Scaled Image</h2>
+            <div style="position: relative;">
+                <canvas id="scaledCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <label>Scale Factor:
+            <select id="scaleSelect">
+                <option value="2">2x</option>
+                <option value="3">3x</option>
+                <option value="4">4x</option>
+            </select>
+        </label>
+        <button id="animateButton">Start Animation</button>
+    </div>
+
+    <div class="explanation">
+        <h3>Lanczos Scaling Algorithm</h3>
+        <p>The Lanczos algorithm is a high-quality resampling method based on the sinc function, often used for resizing images:</p>
+        <ol>
+            <li>For each pixel in the new, larger image</li>
+            <li>Calculate its corresponding position in the original image</li>
+            <li>Use the surrounding pixels weighted by the Lanczos kernel to compute the color for the scaled pixel</li>
+        </ol>
+    </div>
+
+    <script>
+        // Canvas and context setup
+        const originalCanvas = document.getElementById('originalCanvas');
+        const scaledCanvas = document.getElementById('scaledCanvas');
+        const originalCtx = originalCanvas.getContext('2d');
+        const scaledCtx = scaledCanvas.getContext('2d');
+        const stepDescription = document.getElementById('stepDescription');
+        const animateButton = document.getElementById('animateButton');
+        const scaleSelect = document.getElementById('scaleSelect');
+
+        // Animation state
+        let animationFrames = [];
+        let currentFrame = 0;
+        let animationActive = false;
+        let animationInterval;
+
+        // Create a colorful pixel art image
+        function createPixelArtImage() {
+            const size = 35;
+            originalCanvas.width = size;
+            originalCanvas.height = size;
+            
+            const colors = [
+                [255, 0, 0],    // Bright Red
+                [0, 255, 0],    // Bright Green
+                [0, 0, 255],    // Bright Blue
+                [255, 255, 0],  // Yellow
+                [255, 0, 255],  // Magenta
+                [0, 255, 255],  // Cyan
+            ];
+
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    const colorIndex = Math.floor(Math.random() * colors.length);
+                    const [r, g, b] = colors[colorIndex];
+                    originalCtx.fillStyle = `rgb(${r},${g},${b})`;
+                    originalCtx.fillRect(x, y, 1, 1);
+                }
+            }
+        }
+
+        // Reset canvases
+        function resetCanvases() {
+            const scaleFactor = parseInt(scaleSelect.value);
+            const originalSize = originalCanvas.width;
+            const newWidth = originalSize * scaleFactor;
+            const newHeight = originalSize * scaleFactor;
+
+            scaledCanvas.width = newWidth;
+            scaledCanvas.height = newHeight;
+
+            // Clear previous drawings
+            scaledCtx.clearRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+        }
+
+        // Lanczos kernel function
+        function lanczosKernel(x, a) {
+            if (x === 0) return 1;
+            if (Math.abs(x) >= a) return 0;
+            const piX = Math.PI * x;
+            return a * Math.sin(piX) * Math.sin(piX / a) / (piX * piX);
+        }
+
+        // Lanczos interpolation for a pixel (x, y) in the scaled image
+        function lanczosInterpolation(x, y, originalImageData, scaleFactor, a = 3) {
+            const x0 = Math.floor(x / scaleFactor);
+            const y0 = Math.floor(y / scaleFactor);
+
+            let r = 0, g = 0, b = 0;
+            let weightSum = 0;
+
+            // Apply Lanczos interpolation for surrounding pixels
+            for (let j = -a + 1; j <= a; j++) {
+                for (let i = -a + 1; i <= a; i++) {
+                    const xi = Math.min(Math.max(x0 + i, 0), originalCanvas.width - 1);
+                    const yi = Math.min(Math.max(y0 + j, 0), originalCanvas.height - 1);
+                    const idx = (yi * originalCanvas.width + xi) * 4;
+                    const weight = lanczosKernel(i, a) * lanczosKernel(j, a);
+
+                    // Accumulate weighted color values
+                    r += originalImageData.data[idx] * weight;
+                    g += originalImageData.data[idx + 1] * weight;
+                    b += originalImageData.data[idx + 2] * weight;
+                    weightSum += weight;
+                }
+            }
+
+            // Normalize the values
+            r = Math.min(255, Math.max(0, r / weightSum));
+            g = Math.min(255, Math.max(0, g / weightSum));
+            b = Math.min(255, Math.max(0, b / weightSum));
+
+            return [r, g, b, 255];
+        }
+
+        // Prepare animation frames using Lanczos interpolation
+        function prepareAnimationFrames() {
+            animationFrames = [];
+            const sourceImageData = originalCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
+            const scaleFactor = parseInt(scaleSelect.value);
+            resetCanvases();
+
+            const framesCount = 5;
+            for (let frame = 0; frame <= framesCount; frame++) {
+                const progressRatio = frame / framesCount;
+                const newImageData = scaledCtx.createImageData(scaledCanvas.width, scaledCanvas.height);
+                
+                // Fill pixels based on progress
+                for (let y = 0; y < scaledCanvas.height; y++) {
+                    for (let x = 0; x < scaledCanvas.width; x++) {
+                        if (x / scaledCanvas.width <= progressRatio && 
+                            y / scaledCanvas.height <= progressRatio) {
+                            const [r, g, b, a] = lanczosInterpolation(x, y, sourceImageData, scaleFactor);
+                            const idx = (y * scaledCanvas.width + x) * 4;
+                            newImageData.data[idx] = r;
+                            newImageData.data[idx + 1] = g;
+                            newImageData.data[idx + 2] = b;
+                            newImageData.data[idx + 3] = a;
+                            
+                        }
+                    }
+                }
+                animationFrames.push(newImageData);
+            }
+        }
+
+        // Render current animation frame
+        function renderFrame() {
+            scaledCtx.putImageData(animationFrames[currentFrame], 0, 0);
+            currentFrame++;
+
+            if (currentFrame >= animationFrames.length) {
+                clearInterval(animationInterval);
+                stepDescription.textContent = "Animation complete!";
+            }
+        }
+
+        // Start the animation
+        animateButton.addEventListener('click', () => {
+            if (!animationActive) {
+                animationActive = true;
+                currentFrame = 0;
+                stepDescription.textContent = "Animation in progress...";
+                
+                // Clear previous animation frames and the canvas
+                scaledCtx.clearRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+                
+                prepareAnimationFrames(); // Prepare animation frames for the new animation
+                
+                // If an animation is already running, clear the interval first
+                if (animationInterval) {
+                    clearInterval(animationInterval);
+                }
+                
+                animationInterval = setInterval(renderFrame, 100); // 100 ms per frame
+            }
+        });
+
+        // Initialize the pixel art and setup
+        createPixelArtImage();
+    </script>
+</body>
+</html>

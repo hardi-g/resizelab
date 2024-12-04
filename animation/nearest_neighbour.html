@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Nearest Neighbor Scaling Algorithm Animation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 60px; /* Adjust header height */
+            padding: 0 20px;
+            border-bottom: 2px groove black;
+            background: #5797a3;
+            color: #ffdfdf;
+            position: fixed;
+            top: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+            z-index: 1000;
+        }
+        
+        header .logo a {
+            color: #ffdfdf; /* Matches the header text color */
+            text-decoration: none; /* Removes the underline */
+            font-size: 1.5rem; /* Adjust size of the home icon */
+            cursor: pointer;
+        }
+        
+        header nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            justify-content: space-evenly; /* Evenly spaces the items */
+            flex-grow: 1; /* Makes the nav section take up available space */
+        }
+        
+        header nav ul li {
+            font-variant: small-caps;
+            font-weight: 600;
+            font-size: 1rem;
+            text-align: center;
+        }
+        
+        header nav ul li a {
+            text-decoration: none; /* Remove underline */
+            color: #ffdfdf; /* Matches the header text color */
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+            margin-left: 220px;
+        }
+        
+        header nav ul li a:hover {
+            color: #333; /* Change color on hover */
+        }
+        
+        body {
+            font-family: "Poppins", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #faf1e8;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            margin-top: 5%; /* Add margin to avoid overlap with the fixed header */
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background-color: #7eacb5;
+            padding: 15px 30px;
+            border-radius: 10px;
+        }
+        h2 {
+            color: #c96868;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .images-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+        }
+        .canvas-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(255,255,255,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 2px solid #c96868;
+            image-rendering: pixelated;
+           
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        select, button {
+            background-color: #c96868;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        select:hover, button:hover {
+            background-color: #a55555;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        #stepDescription {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #c96868;
+        }
+        .explanation {
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-left: 130px;
+            border: 2px solid #7eacb5;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .explanation h3 {
+            color: #7eacb5;
+            border-bottom: 2px solid #7eacb5;
+            padding-bottom: 10px;
+        }
+        .explanation p, .explanation ol {
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="/display.html" class="home-link">
+                <i class="fas fa-home"></i>
+            </a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="bicubic.html">Bicubic</a></li>
+                <li><a href="lancoze.html">Lanczos</a></li>
+                <li><a href="nearest_neighbour.html">Nearest Neighbour</a></li>
+                <li><a href="bilinear.html">Bilinear</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <h1>Nearest Neighbor Scaling Algorithm Animation</h1>
+        
+        <div id="stepDescription">Click 'Start Animation' to begin</div>
+        
+        <div class="images-container">
+            <div class="canvas-wrapper">
+                <h2>Original Image</h2>
+                <div style="position: relative;">
+                    <canvas id="originalCanvas"></canvas>
+                    <canvas id="originalGridOverlay" class="grid-overlay" style="position: absolute; top: 0; left: 0;"></canvas>
+                </div>
+            </div>
+            <div class="canvas-wrapper">
+                <h2>Scaled Image</h2>
+                <div style="position: relative;">
+                    <canvas id="scaledCanvas"></canvas>
+                    <canvas id="scaledGridOverlay" class="grid-overlay" style="position: absolute; top: 0; left: 0;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <select id="scaleSelect">
+                <option value="2">2x</option>
+                <option value="3">3x</option>
+                <option value="4">4x</option>
+            </select>
+            <button id="animateButton">Start Animation</button>
+        </div>
+
+        <div class="explanation">
+            <h3>Nearest Neighbor Scaling Algorithm</h3>
+            <p>The algorithm maps each pixel in the scaled image back to its corresponding pixel in the original image:</p>
+            <ol style="list-style-type: decimal; padding-left: 2rem;">
+                <li>For each pixel in the new, larger image</li>
+                <li>Calculate its corresponding position in the original image</li>
+                <li>Copy the color of the nearest original pixel</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Canvas and context setup
+        const originalCanvas = document.getElementById('originalCanvas');
+        const scaledCanvas = document.getElementById('scaledCanvas');
+        const originalCtx = originalCanvas.getContext('2d');
+        const scaledCtx = scaledCanvas.getContext('2d');
+        const originalGridOverlay = document.getElementById('originalGridOverlay');
+        const scaledGridOverlay = document.getElementById('scaledGridOverlay');
+        const originalGridCtx = originalGridOverlay.getContext('2d');
+        const scaledGridCtx = scaledGridOverlay.getContext('2d');
+        const stepDescription = document.getElementById('stepDescription');
+        const animateButton = document.getElementById('animateButton');
+        const scaleSelect = document.getElementById('scaleSelect');
+
+        // Animation state
+        let animationFrames = [];
+        let currentFrame = 0;
+        let animationActive = false;
+        let scaleFactor = 2;
+
+        // Create a small pixel art image
+        function createPixelArtImage() {
+            const size = 35;
+            originalCanvas.width = size;
+            originalCanvas.height = size;
+            originalGridOverlay.width = size;
+            originalGridOverlay.height = size;
+
+            const colors = [
+                '#FF6B6B', 
+                '#4ECDC4', 
+                '#45B7D1', 
+                '#FDCB6E', 
+                '#6C5CE7'  
+            ];
+
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    const colorIndex = Math.floor(Math.random() * colors.length);
+                    originalCtx.fillStyle = colors[colorIndex];
+                    originalCtx.fillRect(x, y, 1, 1);
+                }
+            }
+        }
+
+        // Reset canvases
+        function resetCanvases() {
+            scaleFactor = parseInt(scaleSelect.value);
+            const originalSize = originalCanvas.width;
+            const newWidth = originalSize * scaleFactor;
+            const newHeight = originalSize * scaleFactor;
+
+            scaledCanvas.width = newWidth;
+            scaledCanvas.height = newHeight;
+            scaledGridOverlay.width = newWidth;
+            scaledGridOverlay.height = newHeight;
+
+            // Clear previous drawings
+            scaledCtx.clearRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+            scaledGridCtx.clearRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+            originalGridCtx.clearRect(0, 0, originalCanvas.width, originalCanvas.height);
+        }
+
+        // Grid overlay drawing function
+        function drawGridOverlay(canvas, ctx, cellSize = 1) {
+            ctx.strokeStyle = 'rgba(128,128,128,0.1)'; // Neutral gray color
+            ctx.lineWidth = 0.5;
+
+            for (let x = 0; x < canvas.width; x += cellSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+
+            for (let y = 0; y < canvas.height; y += cellSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        }
+
+        // Prepare animation frames
+        function prepareAnimationFrames() {
+            animationFrames = [];
+            const sourceImageData = originalCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
+            const newWidth = originalCanvas.width * scaleFactor;
+            const newHeight = originalCanvas.height * scaleFactor;
+
+            // Prepare frame for each mapped pixel
+            for (let y = 0; y < newHeight; y++) {
+                for (let x = 0; x < newWidth; x++) {
+                    // Map scaled image coordinates to source image coordinates
+                    const sourceX = Math.floor(x / scaleFactor);
+                    const sourceY = Math.floor(y / scaleFactor);
+
+                    // Create animation frame
+                    animationFrames.push({
+                        scaledX: x,
+                        scaledY: y,
+                        sourceX: sourceX,
+                        sourceY: sourceY
+                    });
+                }
+            }
+        }
+
+        // Animate scaling process
+        function animateScaling() {
+            if (currentFrame >= animationFrames.length) {
+                // Animation complete
+                animationActive = false;
+                animateButton.textContent = 'Start Animation';
+                stepDescription.textContent = 'Scaling Complete!';
+                return;
+            }
+
+            // Increased batch size to make animation faster
+            const batchSize = Math.min(200, animationFrames.length - currentFrame);
+            
+            for (let i = 0; i < batchSize; i++) {
+                // Get current frame details
+                const frame = animationFrames[currentFrame + i];
+
+                // Get source pixel data
+                const sourceData = originalCtx.getImageData(frame.sourceX, frame.sourceY, 1, 1);
+
+                // Draw the scaled pixel
+                scaledCtx.putImageData(
+                    new ImageData(
+                        new Uint8ClampedArray([
+                            sourceData.data[0], 
+                            sourceData.data[1], 
+                            sourceData.data[2], 
+                            sourceData.data[3]
+                        ]), 
+                        1, 
+                        1
+                    ), 
+                    frame.scaledX, 
+                    frame.scaledY
+                );
+
+                // Remove highlighting
+                originalGridCtx.clearRect(frame.sourceX, frame.sourceY, 1, 1);
+                scaledGridCtx.clearRect(frame.scaledX, frame.scaledY, 1, 1);
+            }
+
+            // Update current frame and description
+            currentFrame += batchSize;
+            stepDescription.textContent = `Mapping pixel at (${animationFrames[currentFrame - 1].sourceX}, ${animationFrames[currentFrame - 1].sourceY}) in original to (${animationFrames[currentFrame - 1].scaledX}, ${animationFrames[currentFrame - 1].scaledY}) in scaled image`;
+
+            // Continue or complete animation
+            if (currentFrame < animationFrames.length) {
+                requestAnimationFrame(animateScaling);
+            } else {
+                animationActive = false;
+                animateButton.textContent = 'Start Animation';
+                stepDescription.textContent = 'Scaling Complete!';
+            }
+        }
+
+        // Setup event listeners
+        animateButton.addEventListener('click', () => {
+            if (animationActive) return;
+
+            // Reset for new animation
+            resetCanvases();
+            drawGridOverlay(originalCanvas, originalGridCtx);
+            drawGridOverlay(scaledCanvas, scaledGridCtx);
+
+            // Set up animation
+            scaleFactor = parseInt(scaleSelect.value);
+            prepareAnimationFrames();
+            currentFrame = 0;
+            animationActive = true;
+            animateButton.textContent = 'Animating...';
+
+            // Start animation
+            animateScaling();
+        });
+
+        // Initialize
+        createPixelArtImage();
+        resetCanvases();
+        drawGridOverlay(originalCanvas, originalGridCtx);
+        drawGridOverlay(scaledCanvas, scaledGridCtx);
+    </script>
+</body>
+</html>

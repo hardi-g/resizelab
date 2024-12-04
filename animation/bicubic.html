@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bicubic Scaling Algorithm </title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+
+        header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 60px; /* Adjust header height */
+            padding: 0 20px;
+            border-bottom: 2px groove black;
+            background: #5797a3;
+            color: #ffdfdf;
+            position: fixed;
+            top: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+            z-index: 1000;
+        }
+        
+        header .logo a {
+            color: #ffdfdf; /* Matches the header text color */
+            text-decoration: none; /* Removes the underline */
+            font-size: 1.5rem; /* Adjust size of the home icon */
+            cursor: pointer;
+        }
+        
+        header nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            justify-content: space-evenly; /* Evenly spaces the items */
+            flex-grow: 1; /* Makes the nav section take up available space */
+        }
+        
+        header nav ul li {
+            font-variant: small-caps;
+            font-weight: 600;
+            font-size: 1rem;
+            text-align: center;
+        }
+        
+        header nav ul li a {
+            text-decoration: none; /* Remove underline */
+            color: #ffdfdf; /* Matches the header text color */
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+            margin-left: 220px;
+        }
+        
+        header nav ul li a:hover {
+            color: #333; /* Change color on hover */
+        }
+        
+        
+        
+        body {
+            font-family: "Poppins", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #faf1e8;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            margin-top: 5%; /* Add margin to avoid overlap with the fixed header */
+        }
+        
+        h1 {
+            background-color: #7eacb5;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        .canvas-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(255,255,255,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 2px solid #c96868;
+            image-rendering: pixelated;
+            background-color: white;
+        }
+        h2 {
+            color: #c96868;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .controls {
+            margin: 20px 0;
+            background-color: rgba(255,255,255,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .explanation {
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid #7eacb5;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .explanation h3 {
+            color: #7eacb5;
+            border-bottom: 2px solid #7eacb5;
+            padding-bottom: 10px;
+        }
+        #stepDescription {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            color: #c96868;
+        }
+        .grid-overlay {
+            position: absolute;
+            pointer-events: none;
+        }
+        button, select {
+            font-family: "Poppins", sans-serif;
+            background-color: #c96868;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #b55757;
+        }
+        select {
+            background-color: white;
+            color: #333;
+            border: 1px solid #c96868;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="/display.html" class="home-link">
+                <i class="fas fa-home"></i>
+            </a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="bicubic.html">Bicubic</a></li>
+                <li><a href="lancoze.html">Lanczos</a></li>
+                <li><a href="nearest_neighbour.html">Nearest Neighbour</a></li>
+                <li><a href="bilinear.html">Bilinear</a></li>
+            </ul>
+        </nav>
+    </header>
+      
+    <h1>Bicubic Scaling Algorithm </h1>
+    
+    <div id="stepDescription">Click 'Start Animation' to begin</div>
+    
+    <div class="container">
+        <div class="canvas-wrapper">
+            <h2>Original Image</h2>
+            <div style="position: relative;">
+                <canvas id="originalCanvas"></canvas>
+            </div>
+        </div>
+        <div class="canvas-wrapper">
+            <h2>Scaled Image</h2>
+            <div style="position: relative;">
+                <canvas id="scaledCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <label>Scale Factor:
+            <select id="scaleSelect">
+                <option value="2">2x</option>
+                <option value="3">3x</option>
+                <option value="4">4x</option>
+            </select>
+        </label>
+        <button id="animateButton">Start Animation</button>
+    </div>
+
+    <div class="explanation">
+        <h3>Bicubic Scaling Algorithm</h3>
+        <p>The algorithm maps each pixel in the scaled image back to its corresponding pixel in the original image using bicubic interpolation:</p>
+        <ol>
+            <li>For each pixel in the new, larger image</li>
+            <li>Calculate its corresponding position in the original image</li>
+            <li>Use the 16 nearest original pixels to compute the color for the scaled pixel</li>
+        </ol>
+    </div>
+
+    <script>
+        // Canvas and context setup
+        const originalCanvas = document.getElementById('originalCanvas');
+        const scaledCanvas = document.getElementById('scaledCanvas');
+        const originalCtx = originalCanvas.getContext('2d');
+        const scaledCtx = scaledCanvas.getContext('2d');
+        const stepDescription = document.getElementById('stepDescription');
+        const animateButton = document.getElementById('animateButton');
+        const scaleSelect = document.getElementById('scaleSelect');
+
+        // Animation state
+        let animationFrames = [];
+        let currentFrame = 0;
+        let animationActive = false;
+
+        // Create a colorful pixel art image
+        function createPixelArtImage() {
+            const size = 35;
+            originalCanvas.width = size;
+            originalCanvas.height = size;
+            
+            const colors = [
+                [255, 0, 0],    // Bright Red
+                [0, 255, 0],    // Bright Green
+                [0, 0, 255],    // Bright Blue
+                [255, 255, 0],  // Yellow
+                [255, 0, 255],  // Magenta
+                [0, 255, 255],  // Cyan
+            ];
+
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    const colorIndex = Math.floor(Math.random() * colors.length);
+                    const [r, g, b] = colors[colorIndex];
+                    originalCtx.fillStyle = `rgb(${r},${g},${b})`;
+                    originalCtx.fillRect(x, y, 1, 1);
+                }
+            }
+        }
+
+        // Reset canvases
+        function resetCanvases() {
+            const scaleFactor = parseInt(scaleSelect.value);
+            const originalSize = originalCanvas.width;
+            const newWidth = originalSize * scaleFactor;
+            const newHeight = originalSize * scaleFactor;
+
+            scaledCanvas.width = newWidth;
+            scaledCanvas.height = newHeight;
+
+            // Clear previous drawings
+            scaledCtx.clearRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+        }
+
+        // Cubic interpolation helper function
+        function cubicInterpolate(p0, p1, p2, p3, x) {
+            return p1 + 0.5 * (p2 - p0 + x * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3 + x * (3.0 * (p1 - p2) + p3 - p0 + x * (p2 - p0))));
+        }
+
+        // Bicubic interpolation for a pixel (x, y) in the scaled image
+        function bicubicInterpolation(x, y, originalImageData, scaleFactor) {
+            const x0 = Math.floor(x / scaleFactor);
+            const y0 = Math.floor(y / scaleFactor);
+            
+            // Ensure we have enough surrounding pixels
+            const startX = Math.max(0, x0 - 1);
+            const startY = Math.max(0, y0 - 1);
+            const endX = Math.min(originalCanvas.width - 1, x0 + 2);
+            const endY = Math.min(originalCanvas.height - 1, y0 + 2);
+
+            // Interpolation weights
+            const wx = (x / scaleFactor) - x0;
+            const wy = (y / scaleFactor) - y0;
+
+            // Temporary arrays to store pixel values
+            const rowR = [];
+            const rowG = [];
+            const rowB = [];
+
+            // Interpolate rows first
+            for (let j = startY; j <= endY; j++) {
+                const rowPixelsR = [];
+                const rowPixelsG = [];
+                const rowPixelsB = [];
+
+                for (let i = startX; i <= endX; i++) {
+                    const idx = (j * originalCanvas.width + i) * 4;
+                    rowPixelsR.push(originalImageData.data[idx]);
+                    rowPixelsG.push(originalImageData.data[idx + 1]);
+                    rowPixelsB.push(originalImageData.data[idx + 2]);
+                }
+
+                // Extend array if needed for edge cases
+                while (rowPixelsR.length < 4) {
+                    rowPixelsR.push(rowPixelsR[rowPixelsR.length - 1]);
+                    rowPixelsG.push(rowPixelsG[rowPixelsG.length - 1]);
+                    rowPixelsB.push(rowPixelsB[rowPixelsB.length - 1]);
+                }
+
+                // Interpolate each row
+                rowR.push(cubicInterpolate(
+                    rowPixelsR[0], rowPixelsR[1], 
+                    rowPixelsR[2], rowPixelsR[3], wx
+                ));
+                rowG.push(cubicInterpolate(
+                    rowPixelsG[0], rowPixelsG[1], 
+                    rowPixelsG[2], rowPixelsG[3], wx
+                ));
+                rowB.push(cubicInterpolate(
+                    rowPixelsB[0], rowPixelsB[1], 
+                    rowPixelsB[2], rowPixelsB[3], wx
+                ));
+            }
+
+            // Ensure we have enough rows
+            while (rowR.length < 4) {
+                rowR.push(rowR[rowR.length - 1]);
+                rowG.push(rowG[rowG.length - 1]);
+                rowB.push(rowB[rowB.length - 1]);
+            }
+
+            // Final interpolation across rows
+            const r = cubicInterpolate(rowR[0], rowR[1], rowR[2], rowR[3], wy);
+            const g = cubicInterpolate(rowG[0], rowG[1], rowG[2], rowG[3], wy);
+            const b = cubicInterpolate(rowB[0], rowB[1], rowB[2], rowB[3], wy);
+
+            return [
+                Math.max(0, Math.min(255, r)), 
+                Math.max(0, Math.min(255, g)), 
+                Math.max(0, Math.min(255, b)), 
+                255
+            ];
+        }
+
+        // Prepare animation frames using bicubic interpolation
+        function prepareAnimationFrames() {
+            animationFrames = [];
+            const sourceImageData = originalCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
+            const scaleFactor = parseInt(scaleSelect.value);
+            resetCanvases();
+
+            // Reduce number of frames and add clear intermediate steps
+            const framesCount = 5;
+            for (let frame = 0; frame <= framesCount; frame++) {
+                const progressRatio = frame / framesCount;
+                const newImageData = scaledCtx.createImageData(scaledCanvas.width, scaledCanvas.height);
+                
+                // Fill pixels based on progress
+                for (let y = 0; y < scaledCanvas.height; y++) {
+                    for (let x = 0; x < scaledCanvas.width; x++) {
+                        if (x / scaledCanvas.width <= progressRatio && 
+                            y / scaledCanvas.height <= progressRatio) {
+                            const [r, g, b, a] = bicubicInterpolation(x, y, sourceImageData, scaleFactor);
+                            const idx = (y * scaledCanvas.width + x) * 4;
+                            newImageData.data[idx] = r;
+                            newImageData.data[idx + 1] = g;
+                            newImageData.data[idx + 2] = b;
+                            newImageData.data[idx + 3] = a;
+                        }
+                    }
+                }
+                animationFrames.push(newImageData);
+            }
+        }
+
+        // Animate the frames
+        function animate() {
+            if (currentFrame < animationFrames.length) {
+                scaledCtx.putImageData(animationFrames[currentFrame], 0, 0);
+                
+                // Update description with more detailed info
+                const scaleFactor = parseInt(scaleSelect.value);
+                const progress = Math.round((currentFrame / (animationFrames.length - 1)) * 100);
+                stepDescription.textContent = `Scaling Progress: ${progress}% (Interpolating pixels in ${scaleFactor}x scaled image)`;
+                
+                // Delay to make animation slower and more visible
+                setTimeout(() => {
+                    currentFrame++;
+                    requestAnimationFrame(animate);
+                }, 800); // 800ms delay between frames
+            } else {
+                animationActive = false;
+                stepDescription.textContent = 'Scaling Animation Complete';
+            }
+        }
+
+        // Initialize animation
+        animateButton.addEventListener('click', function () {
+            if (animationActive) return;
+
+            animationActive = true;
+            currentFrame = 0;
+            prepareAnimationFrames();
+            animate();
+        });
+
+        // Initial setup
+        createPixelArtImage();
+    </script>
+</body>
+</html>

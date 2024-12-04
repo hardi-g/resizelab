@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Image Scaling</title>
+        <link rel="stylesheet" href="input.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+            rel="stylesheet"
+        />
+        <script src="input.js""></script>
+        <script async src="https://docs.opencv.org/4.5.2/opencv.js" onload="onOpenCvReady()"></script>
+    </head>
+    <body>
+        <div>
+            <p class="text">This is a tool that demonstrates multiple image scaling algorithms
+                and analyzes them. Because everything is run client-side, it is recommended
+                to not use very high resolution images. If you wish to learn more about the
+                image scaling methods being used, click <a href="animation/bilinear.html">HERE</a>.
+            </p>
+            <div class="selectBox">
+                <img src="placeholder.png" />
+                <p>Select an Image</p>
+                <input type="file" accept="image/png, image/jpeg" id="original" disabled/>
+            </div>
+        </div>
+        <div id="processingOverlay" class="processing-overlay">
+            <h2>Processing Images</h2>
+            <p>Scaling images with different methods and factors...</p>
+            <p>Please wait, this may take a moment.</p>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,138 @@
+body {
+    background: #fff4ea;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    min-height: 100vh;
+    overflow: auto;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    height: 10%;
+    justify-content: space-between;
+    border-bottom: 2px groove black;
+    background: #7eacb5;
+    color: #fff4ea;
+    font-size: 2.5vmin;
+    align-items: center;
+    font-variant: small-caps;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+    position: fixed;
+    top: 0;
+}
+
+select {
+    margin-left: 1%;
+    background: #fadfa1;
+    border: none;
+    padding-inline: 10%;
+    -o-appearance: none;
+    -ms-appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    text-align: center;
+    font-size: 2.5vmin;
+    color: #c96868;
+    font-variant: small-caps;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.compBtn {
+    margin-right: 1%;
+    background: #c96868;
+    border: none;
+    text-align: center;
+    font-size: 2.5vmin;
+    color: #fadfa1;
+    font-variant: small-caps;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.compBtn:hover {
+    cursor: pointer;
+    outline: 2px solid #fadfa1;
+}
+
+header select:hover {
+    cursor: pointer;
+    outline: 2px solid #c96868;
+}
+
+.details {
+    display: flex;
+    width: 50vw;
+    margin-left: 5vw;
+    justify-content: space-between;
+}
+
+.metrics {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.metrics p {
+    margin: 0.5vh 0;
+}
+
+.topleft {
+    display: flex;
+    margin-left: 2%;
+    gap: 15%;
+}
+
+.downBtn {
+    background: #fff4ea;
+    padding: 5%;
+    border: none;
+    text-align: center;
+    font-size: 2.5vmin;
+    color: black;
+    font-variant: small-caps;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+    align-self: center;
+    line-height: 1.5vh;
+}
+
+.downBtn:hover {
+    cursor: pointer;
+    outline: 2px solid black;
+}
+
+.topright {
+    display: flex;
+    margin-right: 2%;
+    gap: 5%;
+}
+
+.return {
+    background: #fff4ea;
+    padding: 5%;
+    border: none;
+    text-align: center;
+    font-size: 2.5vmin;
+    color: black;
+    font-variant: small-caps;
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.return:hover {
+    cursor: pointer;
+    outline: 2px solid black;
+}
