@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Interpolation Algorithms Comparison</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        <div style="width: 80vw; margin: auto">
+            <canvas id="psnrChart"></canvas>
+            <canvas id="fsimChart"></canvas>
+            <canvas id="ssimChart"></canvas>
+            <canvas id="timeChart"></canvas>
+        </div>
+
+        <script src="comparison.js"></script>
+        <script>
+            document.addEventListener(
+                "DOMContentLoaded",
+                createComparisonCharts,
+            );
+        </script>
+    </body>
+</html>

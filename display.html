@@ -15,9 +15,8 @@
     </head>
     <body>
         <header>
-            <div class="topleft">
-                <button class="return" onclick="homePage()">Return</button>
-                <select name="scalefactor" id="factor">
+            <div class="options">
+                <select name="scalefactor" id="factor" class="scale">
                     <option value="0.25">0.25x</option>
                     <option value="0.5">0.50x</option>
                     <option value="0.75">0.75x</option>
@@ -26,33 +25,20 @@
                     <option value="1.75">1.75x</option>
                     <option value="2.0">2.00x</option>
                 </select>
-            </div>
-            <div class="details">
-                <div class="metrics">
-                    <p id="time">Processing Time:</p>
-                    <p id="psnr">PSNR:</p>
-                </div>
-                <div class="method">
-                    <p id="method">Scaling Method</p>
-                </div>
-                <div class="metrics">
-                    <p id="ssim">SSIM:</p>
-                    <p id="fsim">FSIM:</p>
-                </div>
-            </div>
-
-            <div class="topright">
-                <button
-                    onclick="ImageManager.downloadCurrentImage()"
-                    class="downBtn"
-                >
-                    Download
-                </button>
                 <button id="compareBtn" class="compBtn">
-                    Graphs & Comparison
+                    Graphs & <br />
+                    Comparison
                 </button>
             </div>
+            <a href="index.html" class="title"><h1>ResizeLab</h1></a>
         </header>
+        <div class="details">
+            <p id="method">Scaling Method</p>
+            <p id="time">Time: measuring...</p>
+            <p id="psnr">PSNR: calculating...</p>
+            <p id="ssim">SSIM: calculating...</p>
+            <p id="fsim">FSIM: calculating...</p>
+        </div>
         <div class="imgOutput" id="imageContainer">
             <p>Loading images...</p>
         </div>

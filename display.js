@@ -27,7 +27,6 @@ async function getImagesByScaleFactor(scaleFactor) {
           img.scaleFactor === parseFloat(scaleFactor) &&
           img.method !== "original",
       );
-      // Order by method: Nearest, Bilinear, Bicubic, Lanczos
       const orderedImages = ["nearest", "bilinear", "bicubic", "lanczos"].map(
         (method) => images.find((img) => img.method === method),
       );
@@ -43,19 +42,9 @@ const ImageManager = {
   setCurrentImage(image) {
     this.currentImage = image;
   },
-
-  downloadCurrentImage() {
-    if (!this.currentImage) return;
-
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(this.currentImage.data);
-    link.download = `scaled_${this.currentImage.method}_${this.currentImage.scaleFactor}x.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
-  },
 };
+
+let currentBlobUrl = null;
 
 function displayImage(image, container, method, time, psnr, ssim, fsim) {
   const imgElement = document.createElement("img");
@@ -68,7 +57,7 @@ function displayImage(image, container, method, time, psnr, ssim, fsim) {
   container.appendChild(imgElement);
 
   method.innerHTML = `<p>${image.method}</p>`;
-  time.innerHTML = `<p>Processing Time: ${image.processingTime}ms</p>`;
+  time.innerHTML = `<p>Time: ${image.processingTime}ms</p>`;
   psnr.innerHTML = `<p>PSNR: ${image.psnr}dB</p>`;
   ssim.innerHTML = `<p>SSIM: ${image.ssim}dB</p>`;
   fsim.innerHTML = `<p>FSIM: ${image.fsim}dB</p>`;
@@ -76,6 +65,12 @@ function displayImage(image, container, method, time, psnr, ssim, fsim) {
   imgElement.onload = () => URL.revokeObjectURL(imgElement.src);
   ImageManager.setCurrentImage(image);
 }
+
+window.addEventListener("beforeunload", () => {
+  if (currentBlobUrl) {
+    URL.revokeObjectURL(currentBlobUrl);
+  }
+});
 
 async function updateImages(scaleFactor) {
   const images = await getImagesByScaleFactor(scaleFactor);
@@ -122,10 +117,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const scaleFactor = event.target.value;
     updateImages(scaleFactor);
   });
-
   updateImages(scaleFactorSelect.value);
 });
 
 function homePage() {
-  window.location.href = "input.html";
+  window.location.href = "index.html";
 }
+
+document.getElementById("compareBtn").addEventListener("click", function () {
+  window.location.href = "comparison.html";
+});
