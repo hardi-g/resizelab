@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function processWithWorkers(file, db) {
   const scalingMethods = ["nearest", "bilinear", "bicubic", "lanczos"];
   const scaleFactors = [0.25, 0.5, 0.75, 1.25, 1.5, 1.75, 2.0];
-  const maxWorkers = Math.min(navigator.hardwareConcurrency || 4, 8);
+  const maxWorkers = Math.min(navigator.hardwareConcurrency || 2, 8);
 
   // Create a queue of tasks instead of processing all at once
   const taskQueue = [];

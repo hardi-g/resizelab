@@ -58,9 +58,12 @@ function displayImage(image, container, method, time, psnr, ssim, fsim) {
 
   method.innerHTML = `<p>${image.method}</p>`;
   time.innerHTML = `<p>Time: ${image.processingTime}ms</p>`;
-  psnr.innerHTML = `<p>PSNR: ${image.psnr}dB</p>`;
-  ssim.innerHTML = `<p>SSIM: ${image.ssim}dB</p>`;
-  fsim.innerHTML = `<p>FSIM: ${image.fsim}dB</p>`;
+  if (image.psnr == Infinity) psnr.innerHTML = `<p>PSNR: Perfect Match</p>`;
+  else psnr.innerHTML = `<p>PSNR: ${image.psnr}dB</p>`;
+  if (image.ssim == 1) ssim.innerHTML = `<p>SSIM: Indentical Structures</p>`;
+  else ssim.innerHTML = `<p>SSIM: ${image.ssim}dB</p>`;
+  if (image.fsim == 1) fsim.innerHTML = `<p>FSIM: Same Features</p>`;
+  else fsim.innerHTML = `<p>FSIM: ${image.fsim}dB</p>`;
 
   imgElement.onload = () => URL.revokeObjectURL(imgElement.src);
   ImageManager.setCurrentImage(image);

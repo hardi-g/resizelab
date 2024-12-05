@@ -92,13 +92,10 @@ async function scaleImageWithOpenCV(
         interpolationFlag,
       );
       const psnr = calculatePSNR(mat, mat2).toFixed(2).toString();
-      console.log(`PSNR: ${psnr}`);
 
       const fsim = calculateFSIM(mat, mat2).toFixed(2).toString();
-      console.log(`FSIM: ${fsim}`);
 
       const ssim = calculateSSIM(mat, mat2).toFixed(2).toString();
-      console.log(`SSIM: ${ssim}`);
 
       resizedOffscreenCanvas
         .convertToBlob({ type: type, quality: 1 })
@@ -131,30 +128,34 @@ function calculateGradientMagnitude(imageData) {
   const width = imageData.width;
   const height = imageData.height;
   const data = imageData.data;
-  const grad = new Array(width * height);
+  const grad = new Array(width * height).fill(0);
 
-  // Sobel operator kernels for edge detection
-  const gx = [-1, 0, 1, -2, 0, 2, -1, 0, 1]; // Horizontal gradient
-  const gy = [-1, -2, -1, 0, 0, 0, 1, 2, 1]; // Vertical gradient
+  // Sobel kernels for x and y gradient
+  const gx = [-1, 0, 1, -2, 0, 2, -1, 0, 1];
+  const gy = [-1, -2, -1, 0, 0, 0, 1, 2, 1];
 
-  // Apply Sobel filter to compute gradients
   for (let y = 1; y < height - 1; y++) {
     for (let x = 1; x < width - 1; x++) {
       let gxVal = 0;
       let gyVal = 0;
 
+      // Compute gradient using Sobel operator
       for (let ky = -1; ky <= 1; ky++) {
         for (let kx = -1; kx <= 1; kx++) {
           const pixel = (y + ky) * width + (x + kx);
+
+          // Convert to grayscale using luminance weights
           const gray =
             0.2989 * data[pixel * 4] +
             0.587 * data[pixel * 4 + 1] +
             0.114 * data[pixel * 4 + 2];
+
           gxVal += gx[(ky + 1) * 3 + (kx + 1)] * gray;
           gyVal += gy[(ky + 1) * 3 + (kx + 1)] * gray;
         }
       }
 
+      // Compute gradient magnitude
       grad[y * width + x] = Math.sqrt(gxVal * gxVal + gyVal * gyVal);
     }
   }
@@ -172,26 +173,29 @@ function calculateScore(imageData1, imageData2) {
   const width = imageData1.width;
   const height = imageData1.height;
 
+  const EPSILON = 0.01; // Small constant to prevent division by zero
+
   for (let y = 1; y < height - 1; y++) {
     for (let x = 1; x < width - 1; x++) {
       const g1 = grad1[y * width + x];
       const g2 = grad2[y * width + x];
 
-      // Enhanced safety checks
-      if (!isFinite(g1) || !isFinite(g2)) {
+      // Robust error checking
+      if (!Number.isFinite(g1) || !Number.isFinite(g2)) {
         console.warn(
           `Invalid gradient values at (${x},${y}): g1=${g1}, g2=${g2}`,
         );
         continue;
       }
 
-      const numerator = 2 * g1 * g2 + 0.01;
-      const denominator = g1 * g1 + g2 * g2 + 0.01;
+      // Similarity calculation
+      const numerator = 2 * g1 * g2 + EPSILON;
+      const denominator = g1 * g1 + g2 * g2 + EPSILON;
 
       if (denominator !== 0) {
         const localScore = numerator / denominator;
 
-        if (isFinite(localScore)) {
+        if (Number.isFinite(localScore)) {
           score += localScore;
           totalPixels++;
         } else {
@@ -206,21 +210,20 @@ function calculateScore(imageData1, imageData2) {
 
 function calculateFSIM(mat1, mat2) {
   try {
-    let imageData1, imageData2;
-
-    imageData1 = new ImageData(
+    // Convert OpenCV matrices to ImageData
+    const imageData1 = new ImageData(
       new Uint8ClampedArray(mat1.data),
       mat1.cols,
       mat1.rows,
     );
-    imageData2 = new ImageData(
+
+    const imageData2 = new ImageData(
       new Uint8ClampedArray(mat2.data),
       mat2.cols,
       mat2.rows,
     );
 
     const fsimScore = calculateScore(imageData1, imageData2);
-
     return fsimScore;
   } catch (error) {
     console.error("Error in calculateFSIM:", error);
@@ -233,17 +236,15 @@ function calculatePSNR(mat1, mat2) {
   cv.absdiff(mat1, mat2, diff);
   const squaredDiff = new cv.Mat();
   cv.pow(diff, 2, squaredDiff);
-
-  const mse = cv.mean(squaredDiff)[0] / 3;
-
+  const mse = cv.mean(squaredDiff);
   diff.delete();
   squaredDiff.delete();
-
-  if (mse === 0) {
+  if (mse[0] === 0 && mse[1] === 0 && mse[2] === 0) {
     return Infinity;
   }
+  const avgMSE = (mse[0] + mse[1] + mse[2]) / 3;
   const maxPixelValue = 255.0;
-  return 10 * Math.log10((maxPixelValue * maxPixelValue) / mse);
+  return 10 * Math.log10((maxPixelValue * maxPixelValue) / avgMSE);
 }
 
 function calculateSSIM(mat1, mat2) {
@@ -264,8 +265,8 @@ function calculateSSIM(mat1, mat2) {
   let windowCount = 0;
 
   // Slide window across the image
-  for (let y = 0; y < height - windowSize; y += windowSize) {
-    for (let x = 0; x < width - windowSize; x += windowSize) {
+  for (let y = 0; y <= height - windowSize; y += Math.floor(windowSize / 2)) {
+    for (let x = 0; x <= width - windowSize; x += Math.floor(windowSize / 2)) {
       // Extract window data for both images
       const window1 = extractWindowFromMat(grayMat1, x, y, windowSize);
       const window2 = extractWindowFromMat(grayMat2, x, y, windowSize);
