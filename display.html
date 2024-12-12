@@ -1,46 +1,52 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Scaled Outputs</title>
-        <link rel="stylesheet" href="display.css" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
-            rel="stylesheet"
-        />
-        <script src="display.js" defer></script>
-    </head>
-    <body>
-        <header>
-            <div class="options">
-                <select name="scalefactor" id="factor" class="scale">
-                    <option value="0.25">0.25x</option>
-                    <option value="0.5">0.50x</option>
-                    <option value="0.75">0.75x</option>
-                    <option value="1.25">1.25x</option>
-                    <option value="1.5">1.50x</option>
-                    <option value="1.75">1.75x</option>
-                    <option value="2.0">2.00x</option>
-                </select>
-                <button id="compareBtn" class="compBtn">
-                    Graphs & <br />
-                    Comparison
-                </button>
-            </div>
-            <a href="index.html" class="title"><h1>ResizeLab</h1></a>
-        </header>
-        <div class="details">
-            <p id="method">Scaling Method</p>
-            <p id="time">Time: measuring...</p>
-            <p id="psnr">PSNR: calculating...</p>
-            <p id="ssim">SSIM: calculating...</p>
-            <p id="fsim">FSIM: calculating...</p>
-        </div>
-        <div class="imgOutput" id="imageContainer">
-            <p>Loading images...</p>
-        </div>
-    </body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scaled Outputs</title>
+    <link rel="stylesheet" href="display.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="display.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <button class="toggle-menu">☰</button>
+
+      <div class="options">
+        <select name="scalefactor" id="factor" class="scale">
+          <option value="0.25">0.25x</option>
+          <option value="0.5">0.50x</option>
+          <option value="0.75">0.75x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.5">1.50x</option>
+          <option value="1.75">1.75x</option>
+          <option value="2.0">2.00x</option>
+        </select>
+        <button id="compareBtn" class="compBtn">
+          Graphs & <br />
+          Comparison
+        </button>
+      </div>
+      <a href="index.html" class="title"><h1>ResizeLab</h1></a>
+    </header>
+
+    <!-- Overlay -->
+    <div class="overlay"></div>
+
+    <div class="details">
+      <p id="method">Scaling Method</p>
+      <p id="time">Time: measuring...</p>
+      <p id="psnr">PSNR: calculating...</p>
+      <p id="ssim">SSIM: calculating...</p>
+      <p id="fsim">FSIM: calculating...</p>
+    </div>
+    <div class="imgOutput" id="imageContainer">
+      <p>Loading images...</p>
+    </div>
+  </body>
 </html>
