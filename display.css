@@ -235,7 +235,7 @@ header {
     flex-direction: column;
     justify-content: center;
     height: auto;
-    padding: 1rem 0;
+/*     padding: 1rem 0; */
   }
 
   .options {
@@ -286,12 +286,12 @@ header {
 /* Toggle button for the sidebar */
 .toggle-menu {
   position: fixed;
-  top: 1rem;
+/*   top: 1rem; */
   left: 1rem;
   background: #fadfa1;
   border: none;
   color: #7eacb5;
-  font-size: 2rem;
+/*   font-size: 2rem; */
   z-index: 1001;
   cursor: pointer;
 }
