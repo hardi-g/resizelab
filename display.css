@@ -100,11 +100,6 @@ header {
     2px -2px 4px rgba(0, 0, 0, 1), -2px 2px 4px rgba(0, 0, 0, 1);
 }
 
-.imgOutput {
-  z-index: -1000;
-  position: relative;
-}
-
 /* Mobile Responsiveness */
 /* @media screen and (max-width: 425px) {
   header {
@@ -235,7 +230,7 @@ header {
     flex-direction: column;
     justify-content: center;
     height: auto;
-/*     padding: 1rem 0; */
+    padding: 1rem 0;
   }
 
   .options {
@@ -286,12 +281,12 @@ header {
 /* Toggle button for the sidebar */
 .toggle-menu {
   position: fixed;
-/*   top: 1rem; */
+  top: 1rem;
   left: 1rem;
   background: #fadfa1;
   border: none;
   color: #7eacb5;
-/*   font-size: 2rem; */
+  font-size: 2rem;
   z-index: 1001;
   cursor: pointer;
 }
