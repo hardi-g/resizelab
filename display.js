@@ -25,10 +25,10 @@ async function getImagesByScaleFactor(scaleFactor) {
       const images = request.result.filter(
         (img) =>
           img.scaleFactor === parseFloat(scaleFactor) &&
-          img.method !== "original",
+          img.method !== "original"
       );
       const orderedImages = ["nearest", "bilinear", "bicubic", "lanczos"].map(
-        (method) => images.find((img) => img.method === method),
+        (method) => images.find((img) => img.method === method)
       );
       resolve(orderedImages);
     };
@@ -97,7 +97,7 @@ async function updateImages(scaleFactor) {
     timeLine,
     psnr,
     ssim,
-    fsim,
+    fsim
   );
 
   imageContainer.addEventListener("click", () => {
@@ -109,7 +109,7 @@ async function updateImages(scaleFactor) {
       timeLine,
       psnr,
       ssim,
-      fsim,
+      fsim
     );
   });
 }
@@ -129,4 +129,52 @@ function homePage() {
 
 document.getElementById("compareBtn").addEventListener("click", function () {
   window.location.href = "comparison.html";
+});
+
+// document.addEventListener("DOMContentLoaded", () => {
+//   // Create sidebar toggle button
+//   const sidebarToggle = document.createElement("button");
+//   sidebarToggle.textContent = "☰";
+//   sidebarToggle.classList.add("sidebar-toggle");
+//   document.body.appendChild(sidebarToggle);
+
+//   // Toggle sidebar functionality
+//   sidebarToggle.addEventListener("click", () => {
+//     document.body.classList.toggle("sidebar-open");
+//   });
+
+//   // Close sidebar when clicking outside
+//   document.addEventListener("click", (event) => {
+//     const header = document.querySelector("header");
+//     const sidebarToggle = document.querySelector(".sidebar-toggle");
+
+//     if (
+//       !header.contains(event.target) &&
+//       !sidebarToggle.contains(event.target) &&
+//       document.body.classList.contains("sidebar-open")
+//     ) {
+//       document.body.classList.remove("sidebar-open");
+//     }
+//   });
+// });
+
+// document.querySelector(".toggle-menu").addEventListener("click", () => {
+//   const options = document.querySelector(".options");
+//   options.classList.toggle("active");
+// });
+
+document.querySelector(".toggle-menu").addEventListener("click", () => {
+  const options = document.querySelector(".options");
+  const overlay = document.querySelector(".overlay");
+
+  options.classList.toggle("active");
+  overlay.classList.toggle("active");
+});
+
+document.querySelector(".overlay").addEventListener("click", () => {
+  const options = document.querySelector(".options");
+  const overlay = document.querySelector(".overlay");
+
+  options.classList.remove("active");
+  overlay.classList.remove("active");
 });
