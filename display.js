@@ -36,44 +36,29 @@ async function getImagesByScaleFactor(scaleFactor) {
   });
 }
 
-const ImageManager = {
-  currentImage: null,
-
-  setCurrentImage(image) {
-    this.currentImage = image;
-  },
-};
-
-let currentBlobUrl = null;
-
 function displayImage(image, container, method, time, psnr, ssim, fsim) {
-  const imgElement = document.createElement("img");
-  imgElement.src = URL.createObjectURL(image.data);
-  imgElement.alt = "Scaled Image";
-  imgElement.className = "scaled-image";
-  imgElement.style.cursor = "pointer";
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    const imgElement = document.createElement("img");
+    imgElement.src = event.target.result;
+    imgElement.alt = "Scaled Image";
+    imgElement.className = "scaled-image";
+    imgElement.style.cursor = "pointer";
+    imgElement.setAttribute("download", "scaled-image.png");
 
-  container.innerHTML = "";
-  container.appendChild(imgElement);
-
+    container.innerHTML = "";
+    container.appendChild(imgElement);
+  };
+  reader.readAsDataURL(image.data);
   method.innerHTML = `<p>${image.method}</p>`;
   time.innerHTML = `<p>Time: ${image.processingTime}ms</p>`;
   if (image.psnr == Infinity) psnr.innerHTML = `<p>PSNR: Perfect Match</p>`;
   else psnr.innerHTML = `<p>PSNR: ${image.psnr}dB</p>`;
-  if (image.ssim == 1) ssim.innerHTML = `<p>SSIM: Indentical Structures</p>`;
+  if (image.ssim == 1) ssim.innerHTML = `<p>SSIM: Identical Structures</p>`;
   else ssim.innerHTML = `<p>SSIM: ${image.ssim}dB</p>`;
   if (image.fsim == 1) fsim.innerHTML = `<p>FSIM: Same Features</p>`;
   else fsim.innerHTML = `<p>FSIM: ${image.fsim}dB</p>`;
-
-  imgElement.onload = () => URL.revokeObjectURL(imgElement.src);
-  ImageManager.setCurrentImage(image);
 }
-
-window.addEventListener("beforeunload", () => {
-  if (currentBlobUrl) {
-    URL.revokeObjectURL(currentBlobUrl);
-  }
-});
 
 async function updateImages(scaleFactor) {
   const images = await getImagesByScaleFactor(scaleFactor);
