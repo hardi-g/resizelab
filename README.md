@@ -1,1 +1,1 @@
-# imagescaling.github.io
+# ResizeLab
